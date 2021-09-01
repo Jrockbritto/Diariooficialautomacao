@@ -113,62 +113,59 @@ def repetido(elementos, comparar):
 
 
 def gerarExcel(links, titulo, data, name):
-    print("----[Salvando documento]----", end="\r", flush=True)
-    hoje = date.today().strftime("%d/%m/%Y")
-    cwd = os.getcwd()
-    path = os.path.join(cwd, "resultado")
-    if os.path.exists(path):
-        if os.path.isfile(os.path.join(path, name)):
-            wb = load_workbook(filename="resultado/" + name)
-            ws = wb.active
-            indexrepetido = repetido(links, ws.cell(1, 4).value)
-            linksunicos = links[indexrepetido:]
-            titulounicos = titulo[indexrepetido:]
-            dataunicos = data[indexrepetido:]
-            if linksunicos == []:
-                print("Nao foram encontrados documentos novos nessa pesquisa")
-            else:
-                print("Foram encontrados " +
-                      str(len(linksunicos)) + " novo(s) documento(s)")
-                increment = ws.cell(1, 2).value
-                if increment and (ws.cell(1, 2, increment).value):
-                    for row_num, dados in enumerate(linksunicos):
-                        # Rownum percorre as lista, enquanto increment move o começo para o ultimo elemento da lista, e o +1 para pular o ultimo elemento
-                        ws.cell(row_num+increment+1, 1, titulounicos[row_num])
-                        ws.cell(row_num+increment+1, 2, dados)  # mesmo de cima
-                        ws.cell(row_num+increment+1, 3,
-                                dataunicos[row_num])  # mesmo de cima
-                        ws.cell(1, 2, row_num+increment+1)
-                        ws.cell(1, 3, titulounicos[row_num])
-                        ws.cell(1, 4, dados)
-                        ws.cell(1, 5, dataunicos[row_num])
-                    ws.cell(1, 1, "Ultima verificação: " + hoje)
-                    wb.save(name)
+   print("----[Salvando documento]----", end="\r", flush=True)
+   hoje = date.today().strftime("%d/%m/%Y")
+   cwd = os.getcwd()
+   path = os.path.join(cwd, "resultado")
+   if os.path.exists(path):
+      if os.path.isfile(os.path.join(path, name)):
+         wb = load_workbook(filename="resultado/" + name)
+         ws = wb.active
+         indexrepetido = repetido(links, ws.cell(1, 4).value)
+         linksunicos = links[indexrepetido:]
+         titulounicos = titulo[indexrepetido:]
+         dataunicos = data[indexrepetido:]
+         if linksunicos == []:
+               print("Nao foram encontrados documentos novos nessa pesquisa")
+         else:
+               print("Foram encontrados " + str(len(linksunicos)) + " novo(s) documento(s)")
+               increment = ws.cell(1, 2).value
+               if increment and (ws.cell(1, 2, increment).value):
+                  for row_num, dados in enumerate(linksunicos):
+                     # Rownum percorre as lista, enquanto increment move o começo para o ultimo elemento da lista, e o +1 para pular o ultimo elemento
+                     ws.cell(row_num+increment+1, 1, titulounicos[row_num])
+                     ws.cell(row_num+increment+1, 2, dados)  # mesmo de cima
+                     ws.cell(row_num+increment+1, 3, dataunicos[row_num])  # mesmo de cima
+                     ws.cell(1, 2, row_num+increment+1)
+                     ws.cell(1, 3, titulounicos[row_num])
+                     ws.cell(1, 4, dados)
+                     ws.cell(1, 5, dataunicos[row_num])
+                  ws.cell(1, 1, "Ultima verificação: " + hoje)
+                  wb.save(name)
 
-                elif links == []:
-                    print("Nao foram encontrados documentos novos nessa pesquisa")
-                else:
-                    print(
-                        "A planilha está vazia. Espere até o programa achar algum documento")
+               elif links == []:
+                  print("Nao foram encontrados documentos novos nessa pesquisa")
+               else:
+                  print(
+                     "A planilha está vazia. Espere até o programa achar algum documento")
 
-    else:
-        print("Foram encontrados " +
-              str(len(links)) + " novo(s) documento(s)")
-        with xlsxwriter.Workbook('resultado' + '/' + name) as workbook:
-            worksheet = workbook.add_worksheet()
-            worksheet.set_column('A:A', 40)
-            worksheet.set_column('B:B', 40)
-            worksheet.set_column('C:C', 20)
-            worksheet.write_string(0, 0, "Ultima verificação: " + hoje)
-            for row_num, dados in enumerate(links):
-                worksheet.write_string(row_num + 1, 0, titulo[row_num])
-                worksheet.write_string(row_num + 1, 1, dados)
-                worksheet.write_string(row_num + 1, 2, data[row_num])
-                # +1 por conta da mudança de coordenada (0:0) para (1:1) +1 para eliminar cabeçalho
-                worksheet.write(0, 1, row_num + 2)
-                worksheet.write_string(0, 2, titulo[row_num])
-                worksheet.write_string(0, 3, dados)
-                worksheet.write_string(0, 4, data[row_num])
+      else:
+         print("Foram encontrados " + str(len(links)) + " novo(s) documento(s)")
+         with xlsxwriter.Workbook('resultado' + '/' + name) as workbook:
+               worksheet = workbook.add_worksheet()
+               worksheet.set_column('A:A', 40)
+               worksheet.set_column('B:B', 40)
+               worksheet.set_column('C:C', 20)
+               worksheet.write_string(0, 0, "Ultima verificação: " + hoje)
+               for row_num, dados in enumerate(links):
+                  worksheet.write_string(row_num + 1, 0, titulo[row_num])
+                  worksheet.write_string(row_num + 1, 1, dados)
+                  worksheet.write_string(row_num + 1, 2, data[row_num])
+                  # +1 por conta da mudança de coordenada (0:0) para (1:1) +1 para eliminar cabeçalho
+                  worksheet.write(0, 1, row_num + 2)
+                  worksheet.write_string(0, 2, titulo[row_num])
+                  worksheet.write_string(0, 3, dados)
+                  worksheet.write_string(0, 4, data[row_num])
 
 
 def mkdir(linkslei, titulolei, datalei, name):
