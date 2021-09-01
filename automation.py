@@ -66,15 +66,14 @@ def start(P_chave, Data, hoje):
 
     page = web.find_element_by_xpath(
         '//*[@id="lblPagina"]').get_attribute('innerHTML')[12:]
-    pagina = 10
     while True:
-        print("----[Capturando Links]---- " + str(porcentagem(i, pagina)) + "%" + " da captura de links", end="\r", flush=True)
+        print("----[Capturando Links]---- " + str(porcentagem(i, page)) + "%" + " da captura de links", end="\r", flush=True)
         linkspage, titulopage, datapage = get_all_links(web)
         for j in range(0, len(linkspage)):
             links.append(linkspage[j])
             titulo.append(titulopage[j])
             data.append(datapage[j])
-        if(i == pagina-1):
+        if(i == page-1):
             pagesaida = web.find_element_by_xpath('//*[@id="lblPagina"]')
             break
         else:
