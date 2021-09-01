@@ -149,7 +149,7 @@ def gerarExcel(links, titulo, data, name):
                      "A planilha está vazia. Espere até o programa achar algum documento")
 
       else:
-         print("Foram encontrados " + str(len(links)) + " novo(s) documento(s)")
+         print("Foram encontrados " + str(len(links)) + " novo(s) documento(s)                              ")
          with xlsxwriter.Workbook('resultado' + '/' + name) as workbook:
                worksheet = workbook.add_worksheet()
                worksheet.set_column('A:A', 40)
