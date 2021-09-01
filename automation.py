@@ -49,8 +49,8 @@ def start(P_chave, Data, hoje):
     print("----[Script Iniciado]----")
     os.environ['WDM_LOG_LEVEL'] = '0'  # remove logs
     options = webdriver.ChromeOptions()  # remove logs
-    options.add_experimental_option(
-        'excludeSwitches', ['enable-logging'])  # remove logs
+    options.add_experimental_option('excludeSwitches', ['enable-logging'])  # remove logs
+    options.add_argument("--headless")
     web = webdriver.Chrome(ChromeDriverManager(
         log_level=0).install(), options=options)
     web.get('http://diariooficial.rn.gov.br/dei/dorn3/Search.aspx')
@@ -60,20 +60,20 @@ def start(P_chave, Data, hoje):
     elinput(Data, '//*[@id="input-bs-data"]', web)  # Preenchendo data inicio
     # Preenchimento da tada final (dia em que o script roda)
     elinput(hoje, '//*[@id="input-bs-data-2"]', web)
-
+    print("----[Carregando o Portal]----", end="\r", flush=True)
     Submit = web.find_element_by_xpath('//*[@id="submit-busca-simples"]')
     Submit.click()
 
-    page = web.find_element_by_xpath(
-        '//*[@id="lblPagina"]').get_attribute('innerHTML')[12:]
+    pagina =10
+    page = int(web.find_element_by_xpath('//*[@id="lblPagina"]').get_attribute('innerHTML')[12:])
     while True:
-        print("----[Capturando Links]---- " + str(porcentagem(i, page)) + "%" + " da captura de links", end="\r", flush=True)
+        print("----[Capturando Links]---- " + str(porcentagem(i, pagina)) + "%" + " da captura de links", end="\r", flush=True)
         linkspage, titulopage, datapage = get_all_links(web)
         for j in range(0, len(linkspage)):
             links.append(linkspage[j])
             titulo.append(titulopage[j])
             data.append(datapage[j])
-        if(i == page-1):
+        if(i == pagina-1):
             pagesaida = web.find_element_by_xpath('//*[@id="lblPagina"]')
             break
         else:
@@ -211,8 +211,8 @@ if __name__ == '__main__':
     data = []
     name = 'Automação DO (Lei 14133).xlsx'
     datainicio = datainicio(name)
-    links, titulo, data, web = start("14.133", datainicio, date.today().strftime(
-        "%d/%m/%Y"))  # parametros: palavra de pesquisa e numero de pag pesquisadas
+    hoje = date.today().strftime("%d/%m/%Y")
+    links, titulo, data, web = start("14.133", datainicio, hoje)  # parametros: palavra de pesquisa e numero de pag pesquisadas
     linkslei, titulolei, datalei = informacoes(links, titulo, data, web)
     mkdir(linkslei, titulolei, datalei, name)
     print("----[Concluido!]----")

@@ -1,6 +1,4 @@
 from cx_Freeze import setup, Executable
-import os
-import sys
 
 base = None
 
@@ -19,7 +17,7 @@ options = {
         'include_files': ['img/'],
         'includes': ["selenium", "webdriver_manager.chrome", "time", "xlsxwriter", "openpyxl", "datetime"],
         'build_exe': 'Automation',
-        'excludes': ['tkinter']
+        'excludes': ['tkinter', 'ctypes', 'html', 'pydoc_data', 'test', 'xmlrpc'] #otimizando script
     },
 }
 
