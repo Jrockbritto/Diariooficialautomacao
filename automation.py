@@ -66,10 +66,9 @@ def start(P_chave, Data, hoje):
 
     page = web.find_element_by_xpath(
         '//*[@id="lblPagina"]').get_attribute('innerHTML')[12:]
-    pagina = 1
+    pagina = 10
     while True:
-        print("----[Capturando Links]---- " + str(porcentagem(i, pagina)
-                                                  ) + "%" + " da captura de links", end="\r", flush=True)
+        print("----[Capturando Links]---- " + str(porcentagem(i, pagina)) + "%" + " da captura de links", end="\r", flush=True)
         linkspage, titulopage, datapage = get_all_links(web)
         for j in range(0, len(linkspage)):
             links.append(linkspage[j])
@@ -219,7 +218,7 @@ if __name__ == '__main__':
     links, titulo, data, web = start("14.133", datainicio, date.today().strftime(
         "%d/%m/%Y"))  # parametros: palavra de pesquisa e numero de pag pesquisadas
     linkslei, titulolei, datalei = informacoes(links, titulo, data, web)
-    mkdir(linkslei, titulolei, datalei, datainicio, name)
+    mkdir(linkslei, titulolei, datalei, name)
     print("----[Concluido!]----")
 
 
