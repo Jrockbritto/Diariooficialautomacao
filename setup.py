@@ -9,7 +9,7 @@ executables = [Executable("automation.py",
                targetName="Automation"
                )]
 
-packages = ["os",'sys']
+packages = ['os','sys', 'logging']
 
 options = {
     'build_exe': {    
