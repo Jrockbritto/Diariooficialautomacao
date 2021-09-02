@@ -19,6 +19,8 @@ O script ainda está em desenvolvimento e algumas melhorias serão implementadas
     - [x] Testes
     - [x] Criação / Abrir arquivo
     - [x] Executável
+    - [x] Otimização
+    - [x] Logs
   - UI 
     - [x] Barra de progresso
 	- [ ] Interface
