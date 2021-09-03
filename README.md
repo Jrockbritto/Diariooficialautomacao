@@ -29,7 +29,7 @@ O script ainda está em desenvolvimento e algumas melhorias serão implementadas
 
 ## Livrarias utilizadas
 
-Selenium Webdriver_manager.chrome,  Time,  Xlsxwriter,  Openpyxl,  Datetime,  Os.
+Selenium, Webdriver_manager.chrome,  Time,  Xlsxwriter,  Openpyxl,  Datetime,  Os, Python-dateutil, Logging.
 
 ## Executável
 
@@ -50,5 +50,7 @@ pip install openpyxl
 pip install datetime
 
 pip install os
+
+pip install python-dateutil
 
 pip install cx_Freeze - Criar o executável
