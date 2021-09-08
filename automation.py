@@ -70,11 +70,15 @@ def start(P_chave, Data, hoje):
     logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': ----[Carregando o Portal]----')
     Submit = web.find_element_by_xpath('//*[@id="submit-busca-simples"]')
     Submit.click()
-
-    page = int(web.find_element_by_xpath('//*[@id="lblPagina"]').get_attribute('innerHTML')[12:])
+    try:
+      page = int(web.find_element_by_xpath('//*[@id="lblPagina"]').get_attribute('innerHTML')[12:])
+    except: 
+      print("Nenhuma matéria encontrada.          ")
+      web.close()
+      raise SystemExit(0)
     logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': ----[Capturando Links]----')
     while True:
-        print("----[Capturando Links]---- " + str(porcentagem(i, page)) + "%" + " da captura de links", end="\r", flush=True)
+        print("----[Capturando Links]---- " + str(porcentagem(i, page)) + "%" + " da captura de links" + " (Pagina " + str(i+1) + " de " + str(page) + ").", end="\r", flush=True)
         linkspage, titulopage, datapage = get_all_links(web)
         for j in range(0, len(linkspage)):
             links.append(linkspage[j])
@@ -98,7 +102,7 @@ def informacoes(links, titulo, data, web):
     logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': ----[Procurando por Ocorrencias]----')
     for i in range(len(links)):
         print("----[Procurando por Ocorrencias]---- " + str(porcentagem(i,
-              len(links))) + "%" + " das paginas", end="\r", flush=True)
+              len(links))) + "%" + " das paginas                                         ", end="\r", flush=True)
         web.get(links[i])
         time.sleep(2)
         conteud = web.find_elements_by_class_name("WordSection1")
@@ -134,12 +138,15 @@ def gerarExcel(links, titulo, data, name):
          titulounicos = titulo[indexrepetido:]
          dataunicos = data[indexrepetido:]
          if linksunicos == []:
-               print("Nao foram encontrados documentos novos nessa pesquisa")
-               logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': Nao foram encontrados documentos novos nessa pesquisa')
+            ws.cell(1, 1, "Ultima verificação: " + hoje)
+            ws.cell(1, 5, hoje)
+            wb.save("resultado/" + name)
+            print("Nao foram encontrados documentos novos nessa pesquisa                                ")
+            logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': Nao foram encontrados documentos novos nessa pesquisa                                 ')
          else:
                increment = ws.cell(1, 2).value
                print("Foram encontrados " + str(len(linksunicos)) + " novo(s) documento(s) a partir de " + str(increment))
-               logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': Foram encontrados ' + str(len(linksunicos)) + ' novo(s) documento(s)')
+               logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': Foram encontrados ' + str(len(linksunicos)) + ' novo(s) documento(s)                        ')
                if increment and (ws.cell(1, 2, increment).value):
                   for row_num, dados in enumerate(linksunicos):
                      # Rownum percorre as lista, enquanto increment move o começo para o ultimo elemento da lista, e o +1 para pular o ultimo elemento
@@ -154,15 +161,20 @@ def gerarExcel(links, titulo, data, name):
                   wb.save("resultado/" + name)
 
                elif links == []:
-                  print("Nao foram encontrados documentos novos nessa pesquisa")
-                  logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': Nao foram encontrados documentos novos nessa pesquisa')
+                  ws.cell(1, 1, "Ultima verificação: " + hoje)
+                  wb.save("resultado/" + name)
+                  print("Nao foram encontrados documentos novos nessa pesquisa                  ")
+                  logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': Nao foram encontrados documentos novos nessa pesquisa                      ')
+
                else:
+                  ws.cell(1, 1, "Ultima verificação: " + hoje)
+                  wb.save("resultado/" + name)
                   print("A planilha está vazia. Espere até o programa achar algum documento")
-                  logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': A planilha está vazia. Espere até o programa achar algum documento')
+                  logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': A planilha está vazia. Espere até o programa achar algum documento                ')
 
       else:
          print("Foram encontrados " + str(len(links)) + " novo(s) documento(s)                              ")
-         logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': Foram encontrados ' + str(len(links)) + ' novo(s) documento(s)')
+         logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': Foram encontrados ' + str(len(links)) + ' novo(s) documento(s)                  ')
          with xlsxwriter.Workbook('resultado' + '/' + name) as workbook:
                worksheet = workbook.add_worksheet()
                worksheet.set_column('A:A', 40)
@@ -185,18 +197,10 @@ def mkdir(linkslei, titulolei, datalei, name):
     path = os.path.join(cwd, "resultado")
     if os.path.exists(path):
         if os.path.isdir(path):
-            if linkslei == []:
-                print("Nao foram encontrados documentos novos nessa pesquisa")
-                logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': Nao foram encontrados documentos novos nessa pesquisa')
-            else:
-                gerarExcel(linkslei, titulolei, datalei, name)
-    else:
-        if linkslei == []:
-            print("Nao foram encontrados documentos novos nessa pesquisa")
-            logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': Nao foram encontrados documentos novos nessa pesquisa')
-        else:
-            os.mkdir("resultado")
             gerarExcel(linkslei, titulolei, datalei, name)
+    else:
+         os.mkdir("resultado")
+         gerarExcel(linkslei, titulolei, datalei, name)
 
 
 def datainicio(name):
@@ -231,13 +235,13 @@ if __name__ == '__main__':
     path = os.path.join(cwd, "logs")
     if os.path.exists(path):
         if os.path.isdir(path):
-           logging.basicConfig(filename='logs/Log ' + '03-09-2021' + '.log', level=logging.WARNING)
+           logging.basicConfig(filename='logs/Log ' + date.today().strftime("%d-%m-%Y") + '.log', level=logging.WARNING)
         else :
            os.mkdir("logs")
-           logging.basicConfig(filename='logs/Log ' + '03-09-2021' + '.log', level=logging.WARNING)
+           logging.basicConfig(filename='logs/Log ' + date.today().strftime("%d-%m-%Y") + '.log', level=logging.WARNING)
     else :
        os.mkdir("logs")
-       logging.basicConfig(filename='logs/Log ' + '03-09-2021' + '.log', level=logging.WARNING)
+       logging.basicConfig(filename='logs/Log ' + date.today().strftime("%d-%m-%Y") + '.log', level=logging.WARNING)
     links, titulo, data, web = start("14.133", datainicio, hoje)  # parametros: palavra de pesquisa e numero de pag pesquisadas
     linkslei, titulolei, datalei = informacoes(links, titulo, data, web)
     mkdir(linkslei, titulolei, datalei, name)
