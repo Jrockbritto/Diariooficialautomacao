@@ -51,7 +51,7 @@ def start(P_chave, Data, hoje):
     i = 0
     print("----[Script Iniciado]----")
     logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': ----[Script Iniciado]----')
-
+    print("  Buscando de: " + datainicio + " até " + hoje)
     os.environ['WDM_LOG_LEVEL'] = '0'  # remove logs
     options = webdriver.ChromeOptions()  # remove logs
     options.add_experimental_option('excludeSwitches', ['enable-logging'])  # remove logs
