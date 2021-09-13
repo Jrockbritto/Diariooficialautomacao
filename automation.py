@@ -52,6 +52,7 @@ def start(P_chave, Data, hoje):
     print("----[Script Iniciado]----")
     logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': ----[Script Iniciado]----')
     print("  Buscando de: " + datainicio + " até " + hoje)
+    logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + "  Buscando de: " + datainicio + " até " + hoje)
     os.environ['WDM_LOG_LEVEL'] = '0'  # remove logs
     options = webdriver.ChromeOptions()  # remove logs
     options.add_experimental_option('excludeSwitches', ['enable-logging'])  # remove logs
@@ -73,8 +74,13 @@ def start(P_chave, Data, hoje):
     try:
       page = int(web.find_element_by_xpath('//*[@id="lblPagina"]').get_attribute('innerHTML')[12:])
     except: 
-      print("Nenhuma matéria encontrada.          ")
+      print("  Nenhuma matéria encontrada.          ")
+      logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ':  Nenhuma matéria encontrada.')
       web.close()
+      print("----[Concluido!]----")
+      logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': ----[Concluido!]----')
+      print("----[O console fechará em 20 segundos]----")
+      time.sleep(20)
       raise SystemExit(0)
     logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': ----[Capturando Links]----')
     while True:
@@ -85,7 +91,6 @@ def start(P_chave, Data, hoje):
             titulo.append(titulopage[j])
             data.append(datapage[j])
         if(i == page-1):
-            pagesaida = web.find_element_by_xpath('//*[@id="lblPagina"]')
             break
         else:
             t = web.find_element_by_xpath(
@@ -127,11 +132,15 @@ def gerarExcel(links, titulo, data, name):
    print("----[Salvando documento]----", end="\r", flush=True)
    logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': ----[Salvando documento]----')
    hoje = date.today().strftime("%d/%m/%Y")
-   cwd = os.getcwd()
-   path = os.path.join(cwd, "resultado")
-   if os.path.exists(path):
-      if os.path.isfile(os.path.join(path, name)):
-         wb = load_workbook(filename="resultado/" + name)
+   if (os.getcwd().find("WINDOWS") != -1) :
+      cwd = os.path.split(os.getcwd())
+      path = os.path.join(cwd[0].replace("WINDOWS",'Automation'), "resultado")
+   else :
+      cwd = os.getcwd()
+      path = os.path.join(cwd, "resultado")
+   if os.path.exists(os.path.join(path,name)):
+      if os.path.isfile(os.path.join(path,name)):
+         wb = load_workbook(filename=os.path.join(path,name))
          ws = wb.active
          indexrepetido = repetido(links, ws.cell(1, 4).value)
          linksunicos = links[indexrepetido:]
@@ -140,7 +149,7 @@ def gerarExcel(links, titulo, data, name):
          if linksunicos == []:
             ws.cell(1, 1, "Ultima verificação: " + hoje)
             ws.cell(1, 5, hoje)
-            wb.save("resultado/" + name)
+            wb.save(path + "/" + name)
             print("Nao foram encontrados documentos novos nessa pesquisa                                ")
             logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': Nao foram encontrados documentos novos nessa pesquisa                                 ')
          else:
@@ -158,58 +167,68 @@ def gerarExcel(links, titulo, data, name):
                      ws.cell(1, 4, dados)
                      ws.cell(1, 5, dataunicos[row_num])
                   ws.cell(1, 1, "Ultima verificação: " + hoje)
-                  wb.save("resultado/" + name)
+                  wb.save(path + "/" + name)
 
                elif links == []:
                   ws.cell(1, 1, "Ultima verificação: " + hoje)
-                  wb.save("resultado/" + name)
+                  wb.save(path + "/" + name)
                   print("Nao foram encontrados documentos novos nessa pesquisa                  ")
                   logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': Nao foram encontrados documentos novos nessa pesquisa                      ')
 
                else:
                   ws.cell(1, 1, "Ultima verificação: " + hoje)
-                  wb.save("resultado/" + name)
+                  wb.save(path + "/" + name)
                   print("A planilha está vazia. Espere até o programa achar algum documento")
                   logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': A planilha está vazia. Espere até o programa achar algum documento                ')
-
       else:
-         print("Foram encontrados " + str(len(links)) + " novo(s) documento(s)                              ")
-         logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': Foram encontrados ' + str(len(links)) + ' novo(s) documento(s)                  ')
-         with xlsxwriter.Workbook('resultado' + '/' + name) as workbook:
-               worksheet = workbook.add_worksheet()
-               worksheet.set_column('A:A', 40)
-               worksheet.set_column('B:B', 40)
-               worksheet.set_column('C:C', 20)
-               worksheet.write_string(0, 0, "Ultima verificação: " + hoje)
-               for row_num, dados in enumerate(links):
-                  worksheet.write_string(row_num + 1, 0, titulo[row_num])
-                  worksheet.write_string(row_num + 1, 1, dados)
-                  worksheet.write_string(row_num + 1, 2, data[row_num])
-                  # +1 por conta da mudança de coordenada (0:0) para (1:1) +1 para eliminar cabeçalho
-                  worksheet.write(0, 1, row_num + 2)
-                  worksheet.write_string(0, 2, titulo[row_num])
-                  worksheet.write_string(0, 3, dados)
-                  worksheet.write_string(0, 4, data[row_num])
-
+         criarxlsx(links, titulo, data, name, path, hoje)
+   else :
+      criarxlsx(links, titulo, data, name, path, hoje)
+def criarxlsx(links, titulo, data, name, path, hoje):
+   print("Foram encontrados " + str(len(links)) + " novo(s) documento(s)                              ")
+   logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': Foram encontrados ' + str(len(links)) + ' novo(s) documento(s)                  ')
+   with xlsxwriter.Workbook(path + "/" + name) as workbook:
+      worksheet = workbook.add_worksheet()
+      worksheet.set_column('A:A', 40)
+      worksheet.set_column('B:B', 40)
+      worksheet.set_column('C:C', 20)
+      worksheet.write_string(0, 0, "Ultima verificação: " + hoje)
+      for row_num, dados in enumerate(links):
+         worksheet.write_string(row_num + 1, 0, titulo[row_num])
+         worksheet.write_string(row_num + 1, 1, dados)
+         worksheet.write_string(row_num + 1, 2, data[row_num])
+         # +1 por conta da mudança de coordenada (0:0) para (1:1) +1 para eliminar cabeçalho
+         worksheet.write(0, 1, row_num + 2)
+         worksheet.write_string(0, 2, titulo[row_num])
+         worksheet.write_string(0, 3, dados)
+         worksheet.write_string(0, 4, data[row_num])
 
 def mkdir(linkslei, titulolei, datalei, name):
-    cwd = os.getcwd()
-    path = os.path.join(cwd, "resultado")
+    if (os.getcwd().find("WINDOWS") != -1) :
+      cwd = os.path.split(os.getcwd())
+      path = os.path.join(cwd[0].replace("WINDOWS",'Automation'), "resultado")
+    else :
+       cwd = os.getcwd()
+       path = os.path.join(cwd, "resultado")
     if os.path.exists(path):
         if os.path.isdir(path):
             gerarExcel(linkslei, titulolei, datalei, name)
     else:
-         os.mkdir("resultado")
+         os.mkdir(path)
          gerarExcel(linkslei, titulolei, datalei, name)
 
 
 def datainicio(name):
     datapadrao = "01/04/2021"
-    cwd = os.getcwd()
-    path = os.path.join(cwd, "resultado")
+    if (os.getcwd().find("WINDOWS") != -1) :
+      cwd = os.path.split(os.getcwd())
+      path = os.path.join(cwd[0].replace("WINDOWS",'Automation'), "resultado")
+    else :
+       cwd = os.getcwd()
+       path = os.path.join(cwd, "resultado")
     if os.path.exists(path):
         if os.path.isfile(os.path.join(path, name)):
-            wb = load_workbook(filename="resultado/" + name)
+            wb = load_workbook(filename= path + "/" + name)
             ws = wb.active
             if ws.cell(1, 5).value:
                 return str(ws.cell(1, 5).value)
@@ -231,22 +250,27 @@ if __name__ == '__main__':
     name = 'Automação DO (Lei 14133).xlsx'
     datainicio = datainicio(name)
     hoje = date.today().strftime("%d/%m/%Y")
-    cwd = os.getcwd()
-    path = os.path.join(cwd, "logs")
+    if (os.getcwd().find("WINDOWS") != -1) :
+      cwd = os.path.split(os.getcwd())
+      path = os.path.join(cwd[0].replace("WINDOWS","Automation"), "logs")
+    else :
+       path = os.path.join(os.getcwd(), "logs")
     if os.path.exists(path):
         if os.path.isdir(path):
-           logging.basicConfig(filename='logs/Log ' + date.today().strftime("%d-%m-%Y") + '.log', level=logging.WARNING)
+           logging.basicConfig(filename= path + '/Log ' + date.today().strftime("%d-%m-%Y") + '.log', level=logging.WARNING)
         else :
            os.mkdir("logs")
-           logging.basicConfig(filename='logs/Log ' + date.today().strftime("%d-%m-%Y") + '.log', level=logging.WARNING)
+           logging.basicConfig(filename= path + '/Log ' + date.today().strftime("%d-%m-%Y") + '.log', level=logging.WARNING)
     else :
-       os.mkdir("logs")
-       logging.basicConfig(filename='logs/Log ' + date.today().strftime("%d-%m-%Y") + '.log', level=logging.WARNING)
+       os.mkdir(path)
+       logging.basicConfig(filename= path + '/Log ' + date.today().strftime("%d-%m-%Y") + '.log', level=logging.WARNING)
     links, titulo, data, web = start("14.133", datainicio, hoje)  # parametros: palavra de pesquisa e numero de pag pesquisadas
     linkslei, titulolei, datalei = informacoes(links, titulo, data, web)
     mkdir(linkslei, titulolei, datalei, name)
     print("----[Concluido!]----")
     logging.warning(str(parse(datetime.now().isoformat(timespec='seconds'))) + ': ----[Concluido!]----')
-
+    print("----[O console fechará em 20 segundos]----")
+    time.sleep(20)
+    raise SystemExit(0)
 
 # usar regex caso queira salvar o texto de um jeito diferente

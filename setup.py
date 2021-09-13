@@ -24,7 +24,7 @@ options = {
 setup(
     name = "AutomaçãoDO",
     options = options,
-    version = "0.5",
+    version = "1.0",
     description = 'Script que busca por documentos que possuam uma substring.',
     executables = executables
 )
