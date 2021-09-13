@@ -33,7 +33,7 @@ Selenium, Webdriver_manager.chrome,  Time,  Xlsxwriter,  Openpyxl,  Datetime,  O
 
 ## Executável
 
-Caso use o executável, é necessária a instalação do Chrome.
+Caso use o executável, é necessária a instalação do Chrome e o folder Automation deve ser colocado na raiz da unidade (ex C:\).
 
 ### Instalações
 
