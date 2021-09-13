@@ -33,7 +33,7 @@ Selenium, Webdriver_manager.chrome,  Time,  Xlsxwriter,  Openpyxl,  Datetime,  O
 
 ## Executável
 
-Caso use o executável, nenhuma instalação é necessária.
+Caso use o executável, é necessária a instalação do Chrome.
 
 ### Instalações
 
