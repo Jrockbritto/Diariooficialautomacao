@@ -12,7 +12,7 @@
 
 O script ainda está em desenvolvimento e algumas melhorias serão implementadas no futuro.
 
-## Roadmarks
+## Roadmap
 
  - Desenvolvimento
     - [x] Alterações
@@ -23,7 +23,6 @@ O script ainda está em desenvolvimento e algumas melhorias serão implementadas
     - [x] Logs
   - UI 
     - [x] Barra de progresso
-	- [ ] Interface
 	- [ ] Parâmetros de pesquisa variáveis
  
 
